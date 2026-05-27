@@ -26,9 +26,9 @@ export class PreloadScene extends Phaser.Scene {
       frameWidth: 96,
       frameHeight: 96
     });
-    this.load.spritesheet('controller', artPath('controller.png'), {
-      frameWidth: 320,
-      frameHeight: 320
+    this.load.spritesheet('spaceBar', artPath('space-bar.png'), {
+      frameWidth: 200,
+      frameHeight: 48
     });
 
     this.load.audio('gameMusic', soundPath('game.mp3'));
@@ -48,8 +48,8 @@ export class PreloadScene extends Phaser.Scene {
 
     this.anims.create({
       key: 'press',
-      frames: this.anims.generateFrameNumbers('controller'),
-      frameRate: 10,
+      frames: this.anims.generateFrameNumbers('spaceBar'),
+      frameRate: 2,
       repeat: -1
     });
 

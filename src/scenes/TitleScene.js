@@ -21,16 +21,34 @@ export class TitleScene extends Phaser.Scene {
 
     this.add.image(0, 0, 'black').setOrigin(0).setAlpha(0.25).setDepth(10);
 
-    const controller = this.add.sprite(375, 890, 'controller').setOrigin(0).setScale(0.8).setDepth(overlayDepth);
-    controller.play('press');
+    const promptY = 1000;
+    const promptGap = 38;
+    const promptOffsetX = 7;
+    const spaceBarScale = 1.25;
+    const pressText = this.add.text(0, promptY, 'Press', this.titleTextStyle()).setDepth(overlayDepth);
+    const spaceBar = this.add.sprite(0, promptY + 20, 'spaceBar').setScale(spaceBarScale).setDepth(overlayDepth);
+    const startText = this.add.text(0, promptY, 'To Start', this.titleTextStyle()).setDepth(overlayDepth);
+    const totalWidth = pressText.width + promptGap + spaceBar.displayWidth + promptGap + startText.width;
+    const promptLeft = (GAME_WIDTH - totalWidth) / 2 + promptOffsetX;
 
-    this.add.text(200, 1000, 'Press', this.titleTextStyle()).setDepth(overlayDepth);
-    this.add.text(610, 1000, 'To Start', this.titleTextStyle()).setDepth(overlayDepth);
+    pressText.setPosition(promptLeft, promptY);
+    spaceBar.setPosition(promptLeft + pressText.width + promptGap + spaceBar.displayWidth / 2, promptY + 22);
+    startText.setPosition(promptLeft + pressText.width + promptGap + spaceBar.displayWidth + promptGap, promptY);
+    spaceBar.play('press');
 
     this.spaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
-    this.enterKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
+    this.input.keyboard.addCapture?.(Phaser.Input.Keyboard.KeyCodes.SPACE);
     this.gamepadWasPressed = this.anyGamepadButtonPressed();
-    this.input.once('pointerdown', () => this.startGame());
+    this.handleWindowKeyDown = (event) => {
+      if (event.code === 'Space' || event.key === ' ') {
+        event.preventDefault();
+        this.startGame();
+      }
+    };
+    window.addEventListener('keydown', this.handleWindowKeyDown);
+    this.events.once('shutdown', () => {
+      window.removeEventListener('keydown', this.handleWindowKeyDown);
+    });
   }
 
   update() {
@@ -39,7 +57,7 @@ export class TitleScene extends Phaser.Scene {
 
     const gamepadPressed = this.anyGamepadButtonPressed();
 
-    if (Phaser.Input.Keyboard.JustDown(this.spaceKey) || Phaser.Input.Keyboard.JustDown(this.enterKey) || (gamepadPressed && !this.gamepadWasPressed)) {
+    if (Phaser.Input.Keyboard.JustDown(this.spaceKey) || (gamepadPressed && !this.gamepadWasPressed)) {
       this.startGame();
     }
 

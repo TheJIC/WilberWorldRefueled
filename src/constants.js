@@ -1,8 +1,8 @@
 export const GAME_WIDTH = 1080;
 export const GAME_HEIGHT = 1920;
 
-export const LANES = [238, 398, 568, 728];
-export const POWERUP_LANES = [285, 445, 610, 775];
+export const LANES = [296, 455, 623, 786];
+export const POWERUP_LANES = [296, 455, 623, 786];
 export const ENEMY_KEYS = [
   'car1',
   'car2',
