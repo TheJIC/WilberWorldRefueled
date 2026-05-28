@@ -39,15 +39,12 @@ export class TitleScene extends Phaser.Scene {
     this.spaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
     this.input.keyboard.addCapture?.(Phaser.Input.Keyboard.KeyCodes.SPACE);
     this.gamepadWasPressed = this.anyGamepadButtonPressed();
-    this.handleWindowKeyDown = (event) => {
-      if (event.code === 'Space' || event.key === ' ') {
-        event.preventDefault();
-        this.startGame();
-      }
-    };
-    window.addEventListener('keydown', this.handleWindowKeyDown);
+    this.spaceAction = () => this.startGame();
+    window.__wilberSpaceAction = this.spaceAction;
     this.events.once('shutdown', () => {
-      window.removeEventListener('keydown', this.handleWindowKeyDown);
+      if (window.__wilberSpaceAction === this.spaceAction) {
+        window.__wilberSpaceAction = null;
+      }
     });
   }
 
@@ -70,7 +67,6 @@ export class TitleScene extends Phaser.Scene {
     }
 
     this.starting = true;
-    this.sound.play('hornSound', { volume: 0.75 });
     this.scene.start('PlayScene');
   }
 

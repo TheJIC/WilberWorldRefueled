@@ -6,6 +6,46 @@ import { PlayScene } from './scenes/PlayScene.js';
 import { WinScene } from './scenes/WinScene.js';
 import { InfoScene } from './scenes/InfoScene.js';
 
+window.__wilberSpaceAction = null;
+
+function isSpaceKey(event) {
+  return event.code === 'Space' || event.key === ' ' || event.key === 'Spacebar';
+}
+
+function installSpaceKeyCapture() {
+  const handleSpace = (event) => {
+    if (!isSpaceKey(event)) {
+      return;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+    event.stopImmediatePropagation();
+
+    if (event.type === 'keydown' && !event.repeat) {
+      window.__wilberSpaceAction?.();
+    }
+  };
+
+  window.addEventListener('keydown', handleSpace, true);
+  window.addEventListener('keyup', handleSpace, true);
+}
+
+function focusGameSurface() {
+  window.focus();
+
+  const gameElement = document.getElementById('game');
+  gameElement?.focus({ preventScroll: true });
+
+  requestAnimationFrame(() => {
+    const canvas = document.querySelector('canvas');
+    if (canvas instanceof HTMLCanvasElement) {
+      canvas.tabIndex = 0;
+      canvas.focus({ preventScroll: true });
+    }
+  });
+}
+
 async function waitForFonts() {
   if (!document.fonts?.load) {
     return;
@@ -17,6 +57,8 @@ async function waitForFonts() {
   ]);
 }
 
+installSpaceKeyCapture();
+focusGameSurface();
 await waitForFonts();
 
 new Phaser.Game({
@@ -40,3 +82,6 @@ new Phaser.Game({
   },
   scene: [PreloadScene, TitleScene, PlayScene, WinScene, InfoScene]
 });
+
+setTimeout(focusGameSurface, 0);
+setTimeout(focusGameSurface, 500);

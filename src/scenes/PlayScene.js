@@ -40,6 +40,7 @@ export class PlayScene extends Phaser.Scene {
     this.createHud();
     this.createInput();
     this.createAudio();
+    this.registerSpaceAction();
     this.runCountdown();
 
     this.physics.add.collider(this.player, this.walls);
@@ -108,14 +109,42 @@ export class PlayScene extends Phaser.Scene {
     });
   }
 
+  registerSpaceAction() {
+    this.spaceAction = () => this.honkHorn();
+    window.__wilberSpaceAction = this.spaceAction;
+
+    this.events.once('shutdown', () => {
+      if (window.__wilberSpaceAction === this.spaceAction) {
+        window.__wilberSpaceAction = null;
+      }
+    });
+  }
+
+  honkHorn() {
+    if (!this.state.controlsEnabled || this.state.ended || !this.player.active) {
+      return;
+    }
+
+    if (this.horn.isPlaying) {
+      this.horn.stop();
+    }
+
+    this.horn.play();
+  }
+
   createAudio() {
     this.music = this.sound.add('gameMusic', {
       loop: true,
       volume: 0.45
     });
+    this.horn = this.sound.add('hornSound', {
+      volume: 0.85
+    });
+    this.music.play();
 
     this.events.once('shutdown', () => {
       this.music?.stop();
+      this.horn?.stop();
     });
   }
 
@@ -154,7 +183,6 @@ export class PlayScene extends Phaser.Scene {
     this.state.controlsEnabled = true;
     this.livesText.setVisible(true);
     this.timerText.setVisible(true);
-    this.music.play();
 
     this.spawnEvent = this.time.addEvent({
       delay: this.state.spawnDelay,
@@ -294,7 +322,7 @@ export class PlayScene extends Phaser.Scene {
       .setScale(2.5)
       .play('boom');
 
-    this.sound.play('explosionSound', { volume: 0.8 });
+    this.sound.play('explosionSound', { volume: 0.35 });
     this.cameras.main.flash(200, 255, 0, 0);
   }
 
@@ -372,19 +400,19 @@ export class PlayScene extends Phaser.Scene {
       .play('boom');
 
     this.player.disableBody(true, true);
-    this.sound.play('deadSound', { volume: 0.9 });
+    this.sound.play('deadSound', { volume: 0.4 });
 
     this.time.delayedCall(1500, () => {
       this.add.text(GAME_WIDTH / 2, 800, 'Game Over', {
         fontFamily: PIXEL_FONT,
         fontSize: '75px',
-        color: '#000000'
-      }).setOrigin(0.5, 0);
+        color: '#ffffff'
+      }).setOrigin(0.5, 0).setDepth(this.hudDepth);
       this.add.text(GAME_WIDTH / 2, 900, 'Press R to Retry', {
         fontFamily: PIXEL_FONT,
         fontSize: '42px',
-        color: '#000000'
-      }).setOrigin(0.5, 0);
+        color: '#ffffff'
+      }).setOrigin(0.5, 0).setDepth(this.hudDepth);
     });
 
     this.input.keyboard.once('keydown-R', () => this.scene.restart());
