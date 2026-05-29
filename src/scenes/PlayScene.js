@@ -138,7 +138,7 @@ export class PlayScene extends Phaser.Scene {
       volume: 0.45
     });
     this.horn = this.sound.add('hornSound', {
-      volume: 0.85
+      volume: 0.25
     });
     this.music.play();
 
@@ -322,7 +322,7 @@ export class PlayScene extends Phaser.Scene {
       .setScale(2.5)
       .play('boom');
 
-    this.sound.play('explosionSound', { volume: 0.35 });
+    this.sound.play('explosionSound', { volume: 0.25 });
     this.cameras.main.flash(200, 255, 0, 0);
   }
 
@@ -400,7 +400,7 @@ export class PlayScene extends Phaser.Scene {
       .play('boom');
 
     this.player.disableBody(true, true);
-    this.sound.play('deadSound', { volume: 0.4 });
+    this.sound.play('deadSound', { volume: 0.30 });
 
     this.time.delayedCall(1500, () => {
       this.add.text(GAME_WIDTH / 2, 800, 'Game Over', {
