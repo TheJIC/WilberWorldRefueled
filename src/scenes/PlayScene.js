@@ -3,6 +3,7 @@ import {
   ENEMY_KEYS,
   GAME_HEIGHT,
   GAME_WIDTH,
+  GAME_MUSIC_VOLUME,
   HIT_INVULNERABILITY,
   LANES,
   LEVEL_SECONDS,
@@ -49,7 +50,7 @@ export class PlayScene extends Phaser.Scene {
   }
 
   update() {
-    this.highway.tilePositionY += this.state.backgroundSpeed;
+    this.highway.tilePositionY -= this.state.backgroundSpeed;
     this.cleanupEnemies();
 
     if (!this.state.ended) {
@@ -67,7 +68,8 @@ export class PlayScene extends Phaser.Scene {
   createPlayer() {
     this.player = this.physics.add.sprite(625, 2500, 'cherryred').setScale(0.8);
     this.player.setCollideWorldBounds(false);
-    this.player.body.setGravityY(100);
+    this.player.body.setAllowGravity(false);
+    this.player.body.setGravityY(0);
 
     this.tweens.add({
       targets: this.player,
@@ -135,7 +137,7 @@ export class PlayScene extends Phaser.Scene {
   createAudio() {
     this.music = this.sound.add('gameMusic', {
       loop: true,
-      volume: 0.45
+      volume: GAME_MUSIC_VOLUME
     });
     this.horn = this.sound.add('hornSound', {
       volume: 0.25
@@ -145,15 +147,16 @@ export class PlayScene extends Phaser.Scene {
     this.events.once('shutdown', () => {
       this.music?.stop();
       this.horn?.stop();
+      this.deadSound?.stop();
     });
   }
 
   runCountdown() {
     [
-      { text: '3', at: 3000, x: 510 },
-      { text: '2', at: 4250, x: 510 },
-      { text: '1', at: 5250, x: 510 },
-      { text: 'GO!', at: 6250, x: 460 }
+      { text: '3', at: 2775, x: 510 },
+      { text: '2', at: 3925, x: 510 },
+      { text: '1', at: 5025, x: 510 },
+      { text: 'GO!', at: 6025, x: 460 }
     ].forEach((step) => {
       this.time.delayedCall(step.at, () => this.flashCountdown(step.text, step.x));
     });
@@ -352,8 +355,12 @@ export class PlayScene extends Phaser.Scene {
 
     this.state.ended = true;
     this.state.controlsEnabled = false;
+    this.tweens.killTweensOf(this.player);
     this.player.setAngle(0);
     this.player.setVelocity(0, 0);
+    this.player.body.stop();
+    this.player.body.setAllowGravity(false);
+    this.player.body.setGravityY(0);
     this.player.setCollideWorldBounds(false);
     this.music?.stop();
     this.stopEvents();
@@ -363,16 +370,23 @@ export class PlayScene extends Phaser.Scene {
 
     const black = this.add.image(0, 0, 'black').setOrigin(0).setAlpha(0).setDepth(10);
 
+    this.tweens.add({
+      targets: this.player,
+      y: GAME_HEIGHT + 500,
+      duration: 750,
+      ease: 'Quad.easeIn'
+    });
+
     this.time.delayedCall(4000, () => {
       this.tweens.add({
         targets: this.player,
         y: -500,
-        duration: 2000,
+        duration: 1200,
         ease: 'Quad.easeIn'
       });
     });
 
-    this.time.delayedCall(6000, () => {
+    this.time.delayedCall(5600, () => {
       this.tweens.add({
         targets: black,
         alpha: 1,
@@ -400,9 +414,10 @@ export class PlayScene extends Phaser.Scene {
       .play('boom');
 
     this.player.disableBody(true, true);
-    this.sound.play('deadSound', { volume: 0.30 });
+    this.deadSound = this.sound.add('deadSound', { volume: 0.30 });
+    this.deadSound.play();
 
-    this.time.delayedCall(1500, () => {
+    this.time.delayedCall(2000, () => {
       this.add.text(GAME_WIDTH / 2, 800, 'Game Over', {
         fontFamily: PIXEL_FONT,
         fontSize: '75px',
@@ -415,7 +430,10 @@ export class PlayScene extends Phaser.Scene {
       }).setOrigin(0.5, 0).setDepth(this.hudDepth);
     });
 
-    this.input.keyboard.once('keydown-R', () => this.scene.restart());
+    this.input.keyboard.once('keydown-R', () => {
+      this.deadSound?.stop();
+      this.scene.restart();
+    });
   }
 
   stopEvents() {

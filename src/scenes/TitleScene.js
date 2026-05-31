@@ -49,7 +49,7 @@ export class TitleScene extends Phaser.Scene {
   }
 
   update() {
-    this.highway.tilePositionY += 18;
+    this.highway.tilePositionY -= 18;
     this.cleanupEnemies();
 
     const gamepadPressed = this.anyGamepadButtonPressed();

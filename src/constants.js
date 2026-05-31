@@ -23,6 +23,7 @@ export const PLAYER_SPEED_UP = 500;
 export const PLAYER_SPEED_DOWN = 700;
 export const HIT_INVULNERABILITY = 1200;
 export const PIXEL_FONT = '"Press Start 2P", "Courier New", monospace';
+export const GAME_MUSIC_VOLUME = 0.45;
 
 export function artPath(name) {
   return `/art/${name}`;

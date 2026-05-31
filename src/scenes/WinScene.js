@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { GAME_MUSIC_VOLUME } from '../constants.js';
 
 export class WinScene extends Phaser.Scene {
   constructor() {
@@ -8,7 +9,7 @@ export class WinScene extends Phaser.Scene {
   create() {
     this.add.image(0, 0, 'win').setOrigin(0);
     const black = this.add.image(0, 0, 'black').setOrigin(0);
-    this.winMusic = this.sound.add('winSound', { volume: 0.75 });
+    this.winMusic = this.sound.add('winSound', { volume: GAME_MUSIC_VOLUME / 2 });
     this.winMusic.play();
 
     this.events.once('shutdown', () => {
