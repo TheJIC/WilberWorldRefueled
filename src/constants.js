@@ -1,8 +1,10 @@
 export const GAME_WIDTH = 1080;
 export const GAME_HEIGHT = 1920;
 
+// X coordinates for the center of each drivable highway lane.
 export const LANES = [296, 455, 623, 786];
-export const POWERUP_LANES = [296, 455, 623, 786];
+
+// Enemy vehicle texture keys. Each key maps to assets/art/<key>.png.
 export const ENEMY_KEYS = [
   'car1',
   'car2',
@@ -17,6 +19,8 @@ export const ENEMY_KEYS = [
 ];
 
 export const LEVEL_SECONDS = 60;
+
+// The intro countdown and player entrance finish before controls unlock.
 export const START_DELAY = 7000;
 export const PLAYER_SPEED_X = 600;
 export const PLAYER_SPEED_UP = 500;

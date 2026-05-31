@@ -1,6 +1,29 @@
 import Phaser from 'phaser';
 import { GAME_HEIGHT, GAME_MUSIC_VOLUME, GAME_WIDTH, PIXEL_FONT } from '../constants.js';
 
+const WIN_MUSIC_VOLUME = GAME_MUSIC_VOLUME / 2;
+const SCENE_FADE_IN_DURATION = 2000;
+const PLAYER_ENTER_DELAY = 2000;
+const PLAYER_ENTER_DURATION = 2000;
+const PLAYER_EXIT_DELAY = 6000;
+const PLAYER_EXIT_DURATION = 500;
+const FIRST_SCREEN_FADE_OUT_DELAY = 6500;
+const FIRST_SCREEN_FADE_OUT_DURATION = 2000;
+const BANNER_FADE_IN_DELAY = 8500;
+const BANNER_FADE_IN_DURATION = 2000;
+const BANNER_ZOOM_DELAY = 2000;
+const BANNER_ZOOM_DURATION = 4000;
+const BANNER_START_SCALE_MULTIPLIER = 1.65;
+const THANKS_TEXT_FADE_DURATION = 800;
+const END_FADE_OUT_DELAY = 20000;
+const END_FADE_OUT_DURATION = 2000;
+const TITLE_RETURN_DELAY = 22500;
+const THANKS_TEXT_X_OFFSET = 60;
+const THANKS_TEXT_Y = 320;
+const THANKS_TEXT_SIZE = '100px';
+
+// The win scene is a timed epilogue: arrive at the sign, fade into the final
+// banner, zoom out, show the thanks message, then loop back to the title.
 export class WinScene extends Phaser.Scene {
   constructor() {
     super('WinScene');
@@ -13,7 +36,7 @@ export class WinScene extends Phaser.Scene {
     const thanksText = this.createThanksText();
     this.winMusic = this.sound.add('winSound', {
       loop: true,
-      volume: GAME_MUSIC_VOLUME / 2
+      volume: WIN_MUSIC_VOLUME
     });
     this.winMusic.play();
 
@@ -21,10 +44,11 @@ export class WinScene extends Phaser.Scene {
       this.winMusic?.stop();
     });
 
+    // Fade up from the black transition created at the end of PlayScene.
     this.tweens.add({
       targets: black,
       alpha: 0,
-      duration: 2000,
+      duration: SCENE_FADE_IN_DURATION,
       ease: 'Linear'
     });
 
@@ -32,54 +56,56 @@ export class WinScene extends Phaser.Scene {
       .setAngle(-90)
       .setScale(0.7);
 
-    this.time.delayedCall(2000, () => {
+    this.time.delayedCall(PLAYER_ENTER_DELAY, () => {
       this.tweens.add({
         targets: player,
         x: 400,
-        duration: 2000,
+        duration: PLAYER_ENTER_DURATION,
         ease: 'Quad.easeOut'
       });
     });
 
-    this.time.delayedCall(6000, () => {
+    this.time.delayedCall(PLAYER_EXIT_DELAY, () => {
       this.tweens.add({
         targets: player,
         x: -200,
-        duration: 500,
+        duration: PLAYER_EXIT_DURATION,
         ease: 'Quad.easeIn'
       });
     });
 
-    this.time.delayedCall(6500, () => {
+    this.time.delayedCall(FIRST_SCREEN_FADE_OUT_DELAY, () => {
       this.tweens.add({
         targets: black,
         alpha: 1,
-        duration: 2000,
+        duration: FIRST_SCREEN_FADE_OUT_DURATION,
         ease: 'Linear'
       });
     });
 
-    this.time.delayedCall(8500, () => {
+    this.time.delayedCall(BANNER_FADE_IN_DELAY, () => {
+      // The banner starts zoomed in and bottom-anchored, then eases out to show
+      // the full final image.
       this.tweens.add({
         targets: wilberWorldPhoto,
         alpha: 1,
-        duration: 2000,
+        duration: BANNER_FADE_IN_DURATION,
         ease: 'Linear'
       });
 
-      this.time.delayedCall(2000, () => {
+      this.time.delayedCall(BANNER_ZOOM_DELAY, () => {
         this.tweens.add({
           targets: wilberWorldPhoto,
           scaleX: wilberWorldPhoto.baseScale,
           scaleY: wilberWorldPhoto.baseScale,
-          duration: 4000,
+          duration: BANNER_ZOOM_DURATION,
           ease: 'Quad.easeOut',
           onUpdate: () => this.positionWilberWorldPhoto(wilberWorldPhoto),
           onComplete: () => {
             this.tweens.add({
               targets: thanksText,
               alpha: 1,
-              duration: 800,
+              duration: THANKS_TEXT_FADE_DURATION,
               ease: 'Linear'
             });
           }
@@ -87,30 +113,30 @@ export class WinScene extends Phaser.Scene {
       });
     });
 
-    this.time.delayedCall(20000, () => {
+    this.time.delayedCall(END_FADE_OUT_DELAY, () => {
       this.tweens.add({
         targets: wilberWorldPhoto,
         alpha: 0,
-        duration: 2000,
+        duration: END_FADE_OUT_DURATION,
         ease: 'Linear'
       });
 
       this.tweens.add({
         targets: thanksText,
         alpha: 0,
-        duration: 2000,
+        duration: END_FADE_OUT_DURATION,
         ease: 'Linear'
       });
 
       this.tweens.add({
         targets: this.winMusic,
         volume: 0,
-        duration: 2000,
+        duration: END_FADE_OUT_DURATION,
         ease: 'Linear'
       });
     });
 
-    this.time.delayedCall(22500, () => this.scene.start('TitleScene'));
+    this.time.delayedCall(TITLE_RETURN_DELAY, () => this.scene.start('TitleScene'));
   }
 
   createWilberWorldPhoto() {
@@ -120,16 +146,16 @@ export class WinScene extends Phaser.Scene {
       .setDepth(20);
     photo.baseScale = Math.max(GAME_WIDTH / photo.width, GAME_HEIGHT / photo.height);
 
-    photo.setScale(photo.baseScale * 1.65);
+    photo.setScale(photo.baseScale * BANNER_START_SCALE_MULTIPLIER);
     this.positionWilberWorldPhoto(photo);
 
     return photo;
   }
 
   createThanksText() {
-    return this.add.text(GAME_WIDTH / 2 + 60, 320, 'Thanks for playing!', {
+    return this.add.text(GAME_WIDTH / 2 + THANKS_TEXT_X_OFFSET, THANKS_TEXT_Y, 'Thanks for playing!', {
       fontFamily: PIXEL_FONT,
-      fontSize: '100px',
+      fontSize: THANKS_TEXT_SIZE,
       color: '#ffffff',
       align: 'center',
       wordWrap: { width: GAME_WIDTH - 100 }
@@ -141,6 +167,7 @@ export class WinScene extends Phaser.Scene {
   }
 
   positionWilberWorldPhoto(photo) {
+    // Recalculate position during the zoom so the bottom edge stays pinned.
     photo.setPosition(
       (GAME_WIDTH - photo.displayWidth) / 2,
       GAME_HEIGHT - photo.displayHeight
