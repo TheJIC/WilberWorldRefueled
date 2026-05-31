@@ -1,18 +1,35 @@
 import Phaser from 'phaser';
 import { artPath, ENEMY_KEYS, soundPath } from '../constants.js';
 
+const IMAGE_ASSETS = [
+  ['highway3', 'road3.png'],
+  ['wall', 'wall.png'],
+  ['black', 'black.png'],
+  ['win', 'win.png'],
+  ['wilberWorldPhoto', 'banner.jpg'],
+  ['cherryred', 'cherryred.png']
+];
+
+// Keeping asset keys in one place makes the scene code read like game logic,
+// while this preload scene stays responsible for file paths.
+const AUDIO_ASSETS = [
+  ['gameMusic', 'game.mp3'],
+  ['hornSound', 'horn.mp3'],
+  ['explosionSound', 'explosion.mp3'],
+  ['deadSound', 'dead.mp3'],
+  ['winSound', 'win.mp3'],
+  ['accelerateSound', 'accelerate.mp3']
+];
+
 export class PreloadScene extends Phaser.Scene {
   constructor() {
     super('PreloadScene');
   }
 
   preload() {
-    this.load.image('highway3', artPath('road3.png'));
-    this.load.image('wall', artPath('wall.png'));
-    this.load.image('black', artPath('black.png'));
-    this.load.image('win', artPath('win.png'));
-    this.load.image('wilberWorldPhoto', artPath('banner.jpg'));
-    this.load.image('cherryred', artPath('cherryred.png'));
+    IMAGE_ASSETS.forEach(([key, file]) => {
+      this.load.image(key, artPath(file));
+    });
 
     ENEMY_KEYS.forEach((key) => {
       this.load.image(key, artPath(`${key}.png`));
@@ -27,12 +44,9 @@ export class PreloadScene extends Phaser.Scene {
       frameHeight: 48
     });
 
-    this.load.audio('gameMusic', soundPath('game.mp3'));
-    this.load.audio('hornSound', soundPath('horn.mp3'));
-    this.load.audio('explosionSound', soundPath('explosion.mp3'));
-    this.load.audio('deadSound', soundPath('dead.mp3'));
-    this.load.audio('winSound', soundPath('win.mp3'));
-    this.load.audio('accelerateSound', soundPath('accelerate.mp3'));
+    AUDIO_ASSETS.forEach(([key, file]) => {
+      this.load.audio(key, soundPath(file));
+    });
   }
 
   create() {

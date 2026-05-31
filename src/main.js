@@ -7,6 +7,8 @@ import { WinScene } from './scenes/WinScene.js';
 
 window.__wilberSpaceAction = null;
 
+// Capture Space at the window level so it never scrolls or refreshes the page.
+// Scenes replace this callback with their current Space-bar behavior.
 function isSpaceKey(event) {
   return event.code === 'Space' || event.key === ' ' || event.key === 'Spacebar';
 }
@@ -33,6 +35,7 @@ function installSpaceKeyCapture() {
 function focusGameSurface() {
   window.focus();
 
+  // Keeping focus on the Phaser canvas makes keyboard input work after refresh.
   const gameElement = document.getElementById('game');
   gameElement?.focus({ preventScroll: true });
 
@@ -71,9 +74,6 @@ new Phaser.Game({
     arcade: {
       gravity: { y: 200 }
     }
-  },
-  input: {
-    gamepad: true
   },
   scale: {
     mode: Phaser.Scale.FIT,
