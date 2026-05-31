@@ -7,16 +7,12 @@ export class PreloadScene extends Phaser.Scene {
   }
 
   preload() {
-    this.load.image('highway', artPath('road.png'));
-    this.load.image('highway2', artPath('road2.png'));
     this.load.image('highway3', artPath('road3.png'));
     this.load.image('wall', artPath('wall.png'));
-    this.load.image('wall2', artPath('wall2.png'));
     this.load.image('black', artPath('black.png'));
     this.load.image('win', artPath('win.png'));
-    this.load.image('wilberinfo', artPath('wilberworldinfo.jpg'));
+    this.load.image('wilberWorldPhoto', artPath('banner.jpg'));
     this.load.image('cherryred', artPath('cherryred.png'));
-    this.load.image('power', artPath('placeholder.png'));
 
     ENEMY_KEYS.forEach((key) => {
       this.load.image(key, artPath(`${key}.png`));
@@ -36,6 +32,7 @@ export class PreloadScene extends Phaser.Scene {
     this.load.audio('explosionSound', soundPath('explosion.mp3'));
     this.load.audio('deadSound', soundPath('dead.mp3'));
     this.load.audio('winSound', soundPath('win.mp3'));
+    this.load.audio('accelerateSound', soundPath('accelerate.mp3'));
   }
 
   create() {

@@ -18,6 +18,7 @@ Open the Vite URL shown in the terminal. The game keeps the original 1080x1920 l
 
 ## Controls
 
-- Move: Arrow keys, WASD, or left gamepad stick
-- Start: Space, Enter, or gamepad button
+- Move: Arrow keys, WASD
+- Start: Space bar
+- Honk: Space bar during gameplay
 - Retry after game over: R

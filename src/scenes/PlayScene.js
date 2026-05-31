@@ -142,12 +142,16 @@ export class PlayScene extends Phaser.Scene {
     this.horn = this.sound.add('hornSound', {
       volume: 0.25
     });
+    this.accelerateSound = this.sound.add('accelerateSound', {
+      volume: GAME_MUSIC_VOLUME
+    });
     this.music.play();
 
     this.events.once('shutdown', () => {
       this.music?.stop();
       this.horn?.stop();
       this.deadSound?.stop();
+      this.accelerateSound?.stop();
     });
   }
 
@@ -382,11 +386,27 @@ export class PlayScene extends Phaser.Scene {
         targets: this.player,
         y: -500,
         duration: 1200,
-        ease: 'Quad.easeIn'
+        ease: 'Quad.easeIn',
+        onStart: () => {
+          this.accelerateSound.stop();
+          this.accelerateSound.setVolume(GAME_MUSIC_VOLUME);
+          this.accelerateSound.play();
+        }
       });
     });
 
     this.time.delayedCall(5600, () => {
+      this.tweens.add({
+        targets: this.accelerateSound,
+        volume: 0,
+        duration: 2000,
+        ease: 'Linear',
+        onComplete: () => {
+          this.accelerateSound.stop();
+          this.accelerateSound.setVolume(GAME_MUSIC_VOLUME);
+        }
+      });
+
       this.tweens.add({
         targets: black,
         alpha: 1,

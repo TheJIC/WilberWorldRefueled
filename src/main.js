@@ -4,7 +4,6 @@ import { PreloadScene } from './scenes/PreloadScene.js';
 import { TitleScene } from './scenes/TitleScene.js';
 import { PlayScene } from './scenes/PlayScene.js';
 import { WinScene } from './scenes/WinScene.js';
-import { InfoScene } from './scenes/InfoScene.js';
 
 window.__wilberSpaceAction = null;
 
@@ -80,7 +79,7 @@ new Phaser.Game({
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH
   },
-  scene: [PreloadScene, TitleScene, PlayScene, WinScene, InfoScene]
+  scene: [PreloadScene, TitleScene, PlayScene, WinScene]
 });
 
 setTimeout(focusGameSurface, 0);
