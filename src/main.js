@@ -59,28 +59,32 @@ async function waitForFonts() {
   ]);
 }
 
-installSpaceKeyCapture();
-focusGameSurface();
-await waitForFonts();
+async function startGame() {
+  installSpaceKeyCapture();
+  focusGameSurface();
+  await waitForFonts();
 
-new Phaser.Game({
-  type: Phaser.AUTO,
-  parent: 'game',
-  width: GAME_WIDTH,
-  height: GAME_HEIGHT,
-  backgroundColor: '#050505',
-  physics: {
-    default: 'arcade',
-    arcade: {
-      gravity: { y: 200 }
-    }
-  },
-  scale: {
-    mode: Phaser.Scale.FIT,
-    autoCenter: Phaser.Scale.CENTER_BOTH
-  },
-  scene: [PreloadScene, TitleScene, PlayScene, WinScene]
-});
+  new Phaser.Game({
+    type: Phaser.AUTO,
+    parent: 'game',
+    width: GAME_WIDTH,
+    height: GAME_HEIGHT,
+    backgroundColor: '#050505',
+    physics: {
+      default: 'arcade',
+      arcade: {
+        gravity: { y: 200 }
+      }
+    },
+    scale: {
+      mode: Phaser.Scale.FIT,
+      autoCenter: Phaser.Scale.CENTER_BOTH
+    },
+    scene: [PreloadScene, TitleScene, PlayScene, WinScene]
+  });
 
-setTimeout(focusGameSurface, 0);
-setTimeout(focusGameSurface, 500);
+  setTimeout(focusGameSurface, 0);
+  setTimeout(focusGameSurface, 500);
+}
+
+startGame();
