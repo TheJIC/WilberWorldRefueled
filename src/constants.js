@@ -29,10 +29,12 @@ export const HIT_INVULNERABILITY = 1200;
 export const PIXEL_FONT = '"Press Start 2P", "Courier New", monospace';
 export const GAME_MUSIC_VOLUME = 0.45;
 
+const BASE_URL = import.meta.env?.BASE_URL ?? './';
+
 export function artPath(name) {
-  return `/art/${name}`;
+  return `${BASE_URL}art/${name}`;
 }
 
 export function soundPath(name) {
-  return `/sounds/${name}`;
+  return `${BASE_URL}sounds/${name}`;
 }
