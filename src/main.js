@@ -4,8 +4,11 @@ import { PreloadScene } from './scenes/PreloadScene.js';
 import { TitleScene } from './scenes/TitleScene.js';
 import { PlayScene } from './scenes/PlayScene.js';
 import { WinScene } from './scenes/WinScene.js';
+import { usesTouchControls } from './inputMode.js';
 
 window.__wilberSpaceAction = null;
+window.__wilberTouchAction = null;
+window.__wilberTouchControlAction = null;
 
 // Capture Space at the window level so it never scrolls or refreshes the page.
 // Scenes replace this callback with their current Space-bar behavior.
@@ -30,6 +33,30 @@ function installSpaceKeyCapture() {
 
   window.addEventListener('keydown', handleSpace, true);
   window.addEventListener('keyup', handleSpace, true);
+}
+
+function installTouchGestureGuards() {
+  if (!usesTouchControls()) {
+    return;
+  }
+
+  const handleTouch = (event) => {
+    event.preventDefault();
+    window.__wilberTouchControlAction?.(event);
+
+    if (event.type === 'touchstart') {
+      window.__wilberTouchAction?.();
+    }
+  };
+  const options = {
+    capture: true,
+    passive: false
+  };
+
+  window.addEventListener('touchstart', handleTouch, options);
+  window.addEventListener('touchmove', handleTouch, options);
+  window.addEventListener('touchend', handleTouch, options);
+  window.addEventListener('gesturestart', handleTouch, options);
 }
 
 function focusGameSurface() {
@@ -61,6 +88,7 @@ async function waitForFonts() {
 
 async function startGame() {
   installSpaceKeyCapture();
+  installTouchGestureGuards();
   focusGameSurface();
   await waitForFonts();
 
@@ -75,6 +103,9 @@ async function startGame() {
       arcade: {
         gravity: { y: 200 }
       }
+    },
+    input: {
+      activePointers: 4
     },
     scale: {
       mode: Phaser.Scale.FIT,
