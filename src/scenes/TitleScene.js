@@ -1,11 +1,13 @@
 import Phaser from 'phaser';
 import { ENEMY_KEYS, GAME_HEIGHT, GAME_WIDTH, LANES, PIXEL_FONT } from '../constants.js';
+import { usesTouchControls } from '../inputMode.js';
 
 const ROAD_SCROLL_SPEED = 18;
 const OVERLAY_DEPTH = 20;
 const ENEMY_DEPTH = 5;
 const TITLE_OVERLAY_ALPHA = 0.25;
 const PROMPT_Y = 1000;
+const INSTRUCTIONS_Y = 1135;
 const PROMPT_GAP = 38;
 const PROMPT_OFFSET_X = 7;
 const SPACE_BAR_SCALE = 1.25;
@@ -14,6 +16,7 @@ const ENEMY_SPAWN_DELAY = 1000;
 const ENEMY_SPAWN_Y = -350;
 const ENEMY_CLEANUP_Y = GAME_HEIGHT + 500;
 const ENEMY_SCALE = 0.8;
+const MAX_SCROLL_DELTA = 1000 / 60;
 
 export class TitleScene extends Phaser.Scene {
   constructor() {
@@ -22,6 +25,7 @@ export class TitleScene extends Phaser.Scene {
 
   create() {
     this.starting = false;
+    this.isTouchMode = usesTouchControls();
 
     // The title screen reuses the gameplay road and falling cars so it feels alive
     // before the player starts the actual round.
@@ -36,6 +40,32 @@ export class TitleScene extends Phaser.Scene {
 
     this.add.image(0, 0, 'black').setOrigin(0).setAlpha(TITLE_OVERLAY_ALPHA).setDepth(10);
 
+    if (this.isTouchMode) {
+      this.createTouchPrompt();
+      this.touchAction = () => this.startGame();
+      window.__wilberTouchAction = this.touchAction;
+      this.input.once('pointerdown', () => this.startGame());
+    } else {
+      this.createKeyboardPrompt();
+    }
+
+    this.spaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+    this.input.keyboard.addCapture?.(Phaser.Input.Keyboard.KeyCodes.SPACE);
+
+    // main.js routes captured Space presses to whichever scene owns this callback.
+    this.spaceAction = () => this.startGame();
+    window.__wilberSpaceAction = this.spaceAction;
+    this.events.once('shutdown', () => {
+      if (window.__wilberSpaceAction === this.spaceAction) {
+        window.__wilberSpaceAction = null;
+      }
+      if (window.__wilberTouchAction === this.touchAction) {
+        window.__wilberTouchAction = null;
+      }
+    });
+  }
+
+  createKeyboardPrompt() {
     // The prompt is built from text plus the animated Space bar sprite so spacing
     // can be tuned independently from the art.
     const pressText = this.add.text(0, PROMPT_Y, 'Press', this.titleTextStyle()).setDepth(OVERLAY_DEPTH);
@@ -49,21 +79,33 @@ export class TitleScene extends Phaser.Scene {
     startText.setPosition(promptLeft + pressText.width + PROMPT_GAP + spaceBar.displayWidth + PROMPT_GAP, PROMPT_Y);
     spaceBar.play('press');
 
-    this.spaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
-    this.input.keyboard.addCapture?.(Phaser.Input.Keyboard.KeyCodes.SPACE);
-
-    // main.js routes captured Space presses to whichever scene owns this callback.
-    this.spaceAction = () => this.startGame();
-    window.__wilberSpaceAction = this.spaceAction;
-    this.events.once('shutdown', () => {
-      if (window.__wilberSpaceAction === this.spaceAction) {
-        window.__wilberSpaceAction = null;
-      }
-    });
+    this.createInstructions([
+      'Avoid Cars',
+      'Survive Until Time Runs Out',
+      '--------------------------',
+      'Arrows / WASD To Drive',
+      'Space Bar To Honk'
+    ]);
   }
 
-  update() {
-    this.highway.tilePositionY -= ROAD_SCROLL_SPEED;
+  createTouchPrompt() {
+    this.add.text(GAME_WIDTH / 2, PROMPT_Y, 'Tap To Start', this.titleTextStyle())
+      .setOrigin(0.5, 0)
+      .setDepth(OVERLAY_DEPTH);
+    this.createInstructions([
+      'Avoid Cars',
+      'Survive Until Time Runs Out'
+    ]);
+  }
+
+  createInstructions(lines) {
+    this.add.text(GAME_WIDTH / 2, INSTRUCTIONS_Y, lines.join('\n'), this.instructionTextStyle())
+      .setOrigin(0.5, 0)
+      .setDepth(OVERLAY_DEPTH);
+  }
+
+  update(_time, delta) {
+    this.highway.tilePositionY -= this.toScrollStep(ROAD_SCROLL_SPEED, delta);
     this.cleanupEnemies();
 
     if (Phaser.Input.Keyboard.JustDown(this.spaceKey)) {
@@ -102,5 +144,19 @@ export class TitleScene extends Phaser.Scene {
       fontSize: '35px',
       color: '#ffffff'
     };
+  }
+
+  instructionTextStyle() {
+    return {
+      fontFamily: PIXEL_FONT,
+      fontSize: '24px',
+      color: '#ffffff',
+      align: 'center',
+      lineSpacing: 20
+    };
+  }
+
+  toScrollStep(speed, delta) {
+    return speed * (Math.min(delta, MAX_SCROLL_DELTA) / MAX_SCROLL_DELTA);
   }
 }

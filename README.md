@@ -16,9 +16,16 @@ Open the Vite URL shown in the terminal. The game keeps the original 1080x1920 l
 - Art files live in `assets/art`.
 - Audio files live in `assets/sounds`.
 
-## Controls
+## Desktop Controls
 
 - Move: Arrow keys, WASD
 - Start: Space bar
 - Honk: Space bar during gameplay
 - Retry after game over: R
+
+## Mobile Controls
+
+- Start: Tap the title screen
+- Move: Touch D-pad
+- Honk: Honk button during gameplay
+- Retry after game over: Tap the retry prompt
