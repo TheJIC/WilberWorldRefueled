@@ -1,6 +1,8 @@
-# Wilber World
+# Wilber World: Refueled
 
-Race to Wilber World is a portrait 2D driving game rebuilt on Phaser 4.
+Wilber World: Refueled is the follow-up/remastered branch of the original portrait 2D highway driving game. The baseline preserves the classic loop: dodge traffic, survive the timer, and reach Wilber World.
+
+This repo is intended for new features, polish, and gameplay experiments while keeping the stabilized original remake separate.
 
 ## Run Locally
 
@@ -10,6 +12,14 @@ npm run dev
 ```
 
 Open the Vite URL shown in the terminal. The game keeps the original 1080x1920 layout and scales to fit the browser window.
+
+For phone testing on the same Wi-Fi:
+
+```sh
+npm run dev -- --host 0.0.0.0 --port 8026
+```
+
+Then visit `http://YOUR-PC-IP:8026/` from the phone.
 
 ## Assets
 
