@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
+    <meta name="theme-color" content="#0b0d16" />
+    <title>Wilber World: Refueled</title>
+    <link rel="icon" type="image/png" href="./art/icon.png" />
+    <!-- Keep the finale hidden before the stylesheet arrives. -->
+    <style>
+      #finale { position: fixed; opacity: 0; pointer-events: none; }
+    </style>
+  </head>
+  <body>
+    <div id="game"></div>
+    <div id="finale" aria-hidden="true">
+      <img id="finale-img" src="./art/wilber-world-banner.jpg" alt="The town of Wilber World" />
+    </div>
+    <script type="module" src="./src/main.ts"></script>
+  </body>
+</html>
